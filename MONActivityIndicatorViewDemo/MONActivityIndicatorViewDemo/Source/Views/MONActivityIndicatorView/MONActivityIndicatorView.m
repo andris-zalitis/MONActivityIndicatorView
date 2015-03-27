@@ -9,9 +9,6 @@
 
 @interface MONActivityIndicatorView ()
 
-/** The default color of each circle. */
-@property (strong, nonatomic) UIColor *defaultColor;
-
 /** An indicator whether the activity indicator view is animating. */
 @property (readwrite, nonatomic) BOOL isAnimating;
 
