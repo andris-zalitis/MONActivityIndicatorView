@@ -27,7 +27,7 @@ IB_DESIGNABLE
 @property (readwrite, nonatomic) IBInspectable CGFloat duration;
 
 /** The default color of each circle. */
-@property (strong, nonatomic) IBInspectable UIColor *defaultColor;
+@property (strong, nonatomic) IBInspectable UIColor *tintColor UI_APPEARANCE_SELECTOR;
 
 /** The assigned delegate */
 @property (weak, nonatomic) id<MONActivityIndicatorViewDelegate> delegate;

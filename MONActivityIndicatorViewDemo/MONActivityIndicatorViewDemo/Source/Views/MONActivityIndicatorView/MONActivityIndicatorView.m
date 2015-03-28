@@ -94,7 +94,7 @@
     self.radius = 10;
     self.delay = 0.2;
     self.duration = 0.8;
-    self.defaultColor = [UIColor lightGrayColor];
+    self.tintColor = [UIColor lightGrayColor];
 }
 
 - (UIView *)createCircleWithRadius:(CGFloat)radius
@@ -128,7 +128,7 @@
             color = [self.delegate activityIndicatorView:self circleBackgroundColorAtIndex:i];
         }
         UIView *circle = [self createCircleWithRadius:self.radius
-                                                color:(color == nil) ? self.defaultColor : color
+                                                color:(color == nil) ? self.tintColor : color
                                             positionX:(i * ((2 * self.radius) + self.internalSpacing))];
         [circle setTransform:CGAffineTransformMakeScale(0, 0)];
         [circle.layer addAnimation:[self createAnimationWithDuration:self.duration delay:(i * self.delay)] forKey:@"scale"];
@@ -177,6 +177,16 @@
 - (void)setInternalSpacing:(CGFloat)internalSpacing {
     _internalSpacing = internalSpacing;
     [self invalidateIntrinsicContentSize];
+}
+
+- (void)setTintColor:(UIColor *)tintColor
+{
+    _tintColor = tintColor;
+    if (self.isAnimating)
+    {
+        [self removeCircles];
+        [self addCircles];
+    }
 }
 
 @end
