@@ -22,39 +22,24 @@
     [super viewDidLoad];
     
     MONActivityIndicatorView *indicatorView = [[MONActivityIndicatorView alloc] init];
-    indicatorView.delegate = self;
-    indicatorView.numberOfCircles = 3;
-    indicatorView.radius = 20;
-    indicatorView.internalSpacing = 3;
+    // indicatorView.delegate = self;
     [indicatorView startAnimating];
-    
+    indicatorView.backgroundColor = [UIColor redColor];
+    indicatorView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:indicatorView];
-    [self placeAtTheCenterWithView:indicatorView];
+    
+    NSDictionary *views = @{ @"indicatorView" : indicatorView,
+                             @"superview" : self.view };
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[indicatorView(==50)]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[superview]-(<=1)-[indicatorView(==100)]" options:NSLayoutFormatAlignAllCenterY metrics:nil views:views]];
+
+    // [self placeAtTheCenterWithView:indicatorView];
     
     [NSTimer scheduledTimerWithTimeInterval:7 target:indicatorView selector:@selector(stopAnimating) userInfo:nil repeats:NO];
     [NSTimer scheduledTimerWithTimeInterval:9 target:indicatorView selector:@selector(startAnimating) userInfo:nil repeats:NO];
 }
 
-#pragma mark -
-#pragma mark - Centering Indicator View
 
-- (void)placeAtTheCenterWithView:(UIView *)view {
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:view
-                                                          attribute:NSLayoutAttributeCenterX
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterX
-                                                         multiplier:1.0f
-                                                           constant:0.0f]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:view
-                                                          attribute:NSLayoutAttributeCenterY
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterY
-                                                         multiplier:1.0f
-                                                           constant:0.0f]];
-}
 
 #pragma mark -
 #pragma mark - MONActivityIndicatorViewDelegate Methods
