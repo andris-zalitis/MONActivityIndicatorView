@@ -9,28 +9,25 @@
 @protocol MONActivityIndicatorViewDelegate;
 
 IB_DESIGNABLE
-@interface MONActivityIndicatorView : UIView
+@interface MONActivityIndicatorView : UIView <UIAppearanceContainer>
 
 /** The number of circle indicators. */
-@property (readwrite, nonatomic) IBInspectable NSUInteger numberOfCircles;
+@property (nonatomic) IBInspectable NSUInteger numberOfCircles;
 
 /** The spacing between circles. */
-@property (readwrite, nonatomic) IBInspectable CGFloat internalSpacing;
+@property (nonatomic) IBInspectable CGFloat internalSpacing;
 
 /** The radius of each circle. */
-@property (readwrite, nonatomic) IBInspectable CGFloat radius;
+@property (nonatomic) IBInspectable CGFloat radius;
 
 /** The base animation delay of each circle. */
-@property (readwrite, nonatomic) IBInspectable CGFloat delay;
+@property (nonatomic) IBInspectable CGFloat delay;
 
 /** The base animation duration of each circle*/
-@property (readwrite, nonatomic) IBInspectable CGFloat duration;
-
-/** The default color of each circle. */
-@property (strong, nonatomic) IBInspectable UIColor *tintColor UI_APPEARANCE_SELECTOR;
+@property (nonatomic) IBInspectable CGFloat duration;
 
 /** The assigned delegate */
-@property (weak, nonatomic) id<MONActivityIndicatorViewDelegate> delegate;
+@property (nonatomic, weak) id<MONActivityIndicatorViewDelegate> delegate;
 
 
 /**

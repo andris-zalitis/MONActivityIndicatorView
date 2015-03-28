@@ -7,75 +7,33 @@
 #import <QuartzCore/QuartzCore.h>
 #import "MONActivityIndicatorView.h"
 
+
+
 @interface MONActivityIndicatorView ()
 
+
+
 /** An indicator whether the activity indicator view is animating. */
-@property (readwrite, nonatomic) BOOL isAnimating;
+@property (nonatomic) BOOL isAnimating;
 
-/**
- Sets up default values
- */
-- (void)setupDefaults;
 
-/**
- Adds circles.
- */
-- (void)addCircles;
-
-/**
- Removes circles.
- */
-- (void)removeCircles;
-
-/**
- Creates the circle view.
- @param radius The radius of the circle.
- @param color The background color of the circle.
- @param positionX The x-position of the circle in the contentView.
- @return The circle view.
- */
-- (UIView *)createCircleWithRadius:(CGFloat)radius color:(UIColor *)color positionX:(CGFloat)x;
-
-/**
- Creates the animation of the circle.
- @param duration The duration of the animation.
- @param delay The delay of the animation
- @return The animation of the circle.
- */
-- (CABasicAnimation *)createAnimationWithDuration:(CGFloat)duration delay:(CGFloat)delay;
 
 @end
 
+
+
 @implementation MONActivityIndicatorView
 
-#pragma mark -
-#pragma mark - Initializations
 
-- (id)init {
-    self = [super initWithFrame:CGRectZero];
-    if (self) {
-        [self setupDefaults];
-    }
-    return self;
-}
 
-- (id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        [self setupDefaults];
-    }
-    return self;
-}
+@synthesize numberOfCircles = _numberOfCircles;
+@synthesize internalSpacing = _internalSpacing;
+@synthesize radius = _radius;
+@synthesize delay = _delay;
+@synthesize duration = _duration;
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-        [self setupDefaults];
-    }
-    return self;
-}
 
-#pragma mark -
+
 #pragma mark - Intrinsic Content Size
 
 - (CGSize)intrinsicContentSize {
@@ -84,22 +42,20 @@
     return CGSizeMake(width, height);
 }
 
-#pragma mark -
+
+
 #pragma mark - Private Methods
 
-- (void)setupDefaults {
-    self.translatesAutoresizingMaskIntoConstraints = NO;
-    self.numberOfCircles = 5;
-    self.internalSpacing = 5;
-    self.radius = 10;
-    self.delay = 0.2;
-    self.duration = 0.8;
-    self.tintColor = [UIColor lightGrayColor];
-}
 
-- (UIView *)createCircleWithRadius:(CGFloat)radius
-                             color:(UIColor *)color
-                         positionX:(CGFloat)x {
+/**
+ Creates the circle view.
+ @param radius The radius of the circle.
+ @param color The background color of the circle.
+ @param positionX The x-position of the circle in the contentView.
+ @return The circle view.
+ */
+- (UIView *)createCircleWithRadius:(CGFloat)radius color:(UIColor *)color positionX:(CGFloat)x
+{
     UIView *circle = [[UIView alloc] initWithFrame:CGRectMake(x, 0, radius * 2, radius * 2)];
     circle.backgroundColor = color;
     circle.layer.cornerRadius = radius;
@@ -107,6 +63,12 @@
     return circle;
 }
 
+/**
+ Creates the animation of the circle.
+ @param duration The duration of the animation.
+ @param delay The delay of the animation
+ @return The animation of the circle.
+ */
 - (CABasicAnimation *)createAnimationWithDuration:(CGFloat)duration delay:(CGFloat)delay {
     CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
     anim.delegate = self;
@@ -123,12 +85,12 @@
 
 - (void)addCircles {
     for (NSUInteger i = 0; i < self.numberOfCircles; i++) {
-        UIColor *color = nil;
+        UIColor *color = self.tintColor;
         if (self.delegate && [self.delegate respondsToSelector:@selector(activityIndicatorView:circleBackgroundColorAtIndex:)]) {
             color = [self.delegate activityIndicatorView:self circleBackgroundColorAtIndex:i];
         }
         UIView *circle = [self createCircleWithRadius:self.radius
-                                                color:(color == nil) ? self.tintColor : color
+                                                color:color
                                             positionX:(i * ((2 * self.radius) + self.internalSpacing))];
         [circle setTransform:CGAffineTransformMakeScale(0, 0)];
         [circle.layer addAnimation:[self createAnimationWithDuration:self.duration delay:(i * self.delay)] forKey:@"scale"];
@@ -142,7 +104,8 @@
     }];
 }
 
-#pragma mark -
+
+
 #pragma mark - Public Methods
 
 - (void)startAnimating {
@@ -161,12 +124,27 @@
     }
 }
 
-#pragma mark -
+
+
 #pragma mark - Custom Setters and Getters
+
+- (NSUInteger)numberOfCircles
+{
+    if (!_numberOfCircles) return 5;
+    return _numberOfCircles;
+}
 
 - (void)setNumberOfCircles:(NSUInteger)numberOfCircles {
     _numberOfCircles = numberOfCircles;
     [self invalidateIntrinsicContentSize];
+}
+
+
+
+- (CGFloat)radius
+{
+    if (!_radius) return 10.f;
+    return _radius;
 }
 
 - (void)setRadius:(CGFloat)radius {
@@ -174,14 +152,40 @@
     [self invalidateIntrinsicContentSize];
 }
 
+
+
+- (CGFloat)delay
+{
+    if (!_delay) return 0.2f;
+    return _delay;
+}
+
+
+
+- (CGFloat)duration
+{
+    if (!_duration) return 0.8f;
+    return _duration;
+}
+
+
+- (CGFloat)internalSpacing
+{
+    if (!_internalSpacing) return 5;
+    return _internalSpacing;
+}
+
 - (void)setInternalSpacing:(CGFloat)internalSpacing {
     _internalSpacing = internalSpacing;
     [self invalidateIntrinsicContentSize];
 }
 
+
+
 - (void)setTintColor:(UIColor *)tintColor
 {
-    _tintColor = tintColor;
+    [super setTintColor:tintColor];
+
     if (self.isAnimating)
     {
         [self removeCircles];
