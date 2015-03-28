@@ -36,16 +36,11 @@ MONActivityIndicatorView is an awesome custom activity indicator view for iOS.
 
 ## Customization
 
-### Default Property Values
-* Animation delay           : `delay           = 0.2`
-* Animation duration        : `duration        = 0.8`
-* Number of circles         : `numberOfCircles = 5`
-* Circle's radius           : `radius          = 10`
-* Circle's internal spacing : `internalSpacing = 5`
-* Circle's background Color : `defaultColor    = [UIColor lightGrayColor]`
 
 
-### Custom Property Values
+### Custom Properties
+MONActivityIndicator is totally customizable:
+
 ``` objective-c
 - (void)viewDidLoad {
   [super viewDidLoad];
@@ -56,8 +51,7 @@ MONActivityIndicatorView is an awesome custom activity indicator view for iOS.
   indicatorView.internalSpacing = 3;
   indicatorView.duration = 0.5;
   indicatorView.delay = 0.5
-  indicatorView.center = self.view.center;
-  [self.view addSubview:indicatorView];
+  ...
   [indicatorView startAnimating];
 }
 ```
@@ -88,11 +82,10 @@ MONActivityIndicatorView supports IBInspectable, so you can set the tintColor in
 
 **Option 3**
 
-MONActivityIndicatorViewDelegate provides the method `activityIndicatorView:circleBackgroundColorAtIndex:`, which you can implement in your delegate.
+MONActivityIndicatorViewDelegate provides the method `activityIndicatorView:dotColorAtIndex:`, which you can implement in your delegate.
 
 ``` objective-c
 @interface ViewController : UIViewController <MONActivityIndicatorViewDelegate>
-
 @end
 
 @implementation ViewController
@@ -102,24 +95,12 @@ MONActivityIndicatorViewDelegate provides the method `activityIndicatorView:circ
   
   MONActivityIndicatorView *indicatorView = [[MONActivityIndicatorView alloc] init];
   indicatorView.delegate = self;
-  indicatorView.numberOfCircles = 3;
-  indicatorView.radius = 20;
-  indicatorView.internalSpacing = 3;
-  indicatorView.duration = 0.5;
-  indicatorView.delay = 0.5
-  indicatorView.center = self.view.center;
-  [self.view addSubview:indicatorView];
+  ...
   [indicatorView startAnimating];
 }
 
-- (UIColor *)activityIndicatorView:(MONActivityIndicatorView *)activityIndicatorView
-      circleBackgroundColorAtIndex:(NSUInteger)index {
-  // For a random background color for a particular circle
-  CGFloat red   = (arc4random() % 256)/255.0;
-  CGFloat green = (arc4random() % 256)/255.0;
-  CGFloat blue  = (arc4random() % 256)/255.0;
-  CGFloat alpha = 1.0f;
-  return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+- (UIColor *)activityIndicatorView:(MONActivityIndicatorView *)activityIndicatorView dotColorAtIndex:(NSUInteger)index {
+  return [UIColor redColor];
 }
 
 @end
