@@ -62,8 +62,34 @@ MONActivityIndicatorView is an awesome custom activity indicator view for iOS.
 }
 ```
 
-### Custom Circle's Background Color
-First, assign the `MONActivityIndicatorViewDelegate` protocol to a view controller. Then, implement the method `activityIndicatorView:circleBackgroundColorAtIndex:`
+### Custom Dot Color
+There are several ways to set the color of the dots in this component.
+
+**Option 1**
+
+MONActivityIndicatorView conforms to UIAppearance, so you can do this:
+
+``` objective-c
+[[MONActivityIndicatorView appearance] setTintColor:[UIColor redColor]];
+```
+
+or this:
+
+``` objective-c
+MONActivityIndicatorView *indicatorView = [[MONActivityIndicatorView alloc] init];
+indicatorView.tintColor = [UIColor redColor];
+```
+
+
+**Option 2**
+
+MONActivityIndicatorView supports IBInspectable, so you can set the tintColor in Interface Builder/Storyboard.
+
+
+**Option 3**
+
+MONActivityIndicatorViewDelegate provides the method `activityIndicatorView:circleBackgroundColorAtIndex:`, which you can implement in your delegate.
+
 ``` objective-c
 @interface ViewController : UIViewController <MONActivityIndicatorViewDelegate>
 
