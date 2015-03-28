@@ -86,12 +86,10 @@
 - (void)addCircles {
     for (NSUInteger i = 0; i < self.numberOfCircles; i++) {
         UIColor *color = self.tintColor;
-        if (self.delegate && [self.delegate respondsToSelector:@selector(activityIndicatorView:circleBackgroundColorAtIndex:)]) {
-            color = [self.delegate activityIndicatorView:self circleBackgroundColorAtIndex:i];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(activityIndicatorView:dotColorAtIndex:)]) {
+            color = [self.delegate activityIndicatorView:self dotColorAtIndex:i];
         }
-        UIView *circle = [self createCircleWithRadius:self.radius
-                                                color:color
-                                            positionX:(i * ((2 * self.radius) + self.internalSpacing))];
+        UIView *circle = [self createCircleWithRadius:self.radius color:color positionX:(i * ((2 * self.radius) + self.internalSpacing))];
         [circle setTransform:CGAffineTransformMakeScale(0, 0)];
         [circle.layer addAnimation:[self createAnimationWithDuration:self.duration delay:(i * self.delay)] forKey:@"scale"];
         [self addSubview:circle];
@@ -136,6 +134,11 @@
 
 - (void)setNumberOfCircles:(NSUInteger)numberOfCircles {
     _numberOfCircles = numberOfCircles;
+    if (self.isAnimating)
+    {
+        [self removeCircles];
+        [self addCircles];
+    }
     [self invalidateIntrinsicContentSize];
 }
 

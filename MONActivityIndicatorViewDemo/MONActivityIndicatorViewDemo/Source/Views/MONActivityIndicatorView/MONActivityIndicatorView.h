@@ -52,7 +52,6 @@ IB_DESIGNABLE
  @param index The index of a particular circle.
  @return The background color of a particular circle.
  */
-- (UIColor *)activityIndicatorView:(MONActivityIndicatorView *)activityIndicatorView
-      circleBackgroundColorAtIndex:(NSUInteger)index;
+- (UIColor *)activityIndicatorView:(MONActivityIndicatorView *)activityIndicatorView dotColorAtIndex:(NSUInteger)index;
 
 @end
