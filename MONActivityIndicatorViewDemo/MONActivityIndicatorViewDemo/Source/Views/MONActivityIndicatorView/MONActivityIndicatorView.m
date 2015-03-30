@@ -47,6 +47,19 @@
 #pragma mark - Private Methods
 
 
+
+- (void)refresh
+{
+    if (self.isAnimating)
+    {
+        [self removeCircles];
+        [self addCircles];
+    }
+    [self invalidateIntrinsicContentSize];
+}
+
+
+
 /**
  Creates the circle view.
  @param radius The radius of the circle.
@@ -124,7 +137,9 @@
 
 
 
-#pragma mark - Custom Setters and Getters
+#pragma mark - *** Custom Setters and Getters ***
+
+#pragma mark - Number of Circles
 
 - (NSUInteger)numberOfCircles
 {
@@ -132,17 +147,16 @@
     return _numberOfCircles;
 }
 
+
+
 - (void)setNumberOfCircles:(NSUInteger)numberOfCircles {
     _numberOfCircles = numberOfCircles;
-    if (self.isAnimating)
-    {
-        [self removeCircles];
-        [self addCircles];
-    }
-    [self invalidateIntrinsicContentSize];
+    [self refresh];
 }
 
 
+
+#pragma mark - Radius
 
 - (CGFloat)radius
 {
@@ -152,10 +166,12 @@
 
 - (void)setRadius:(CGFloat)radius {
     _radius = radius;
-    [self invalidateIntrinsicContentSize];
+    [self refresh];
 }
 
 
+
+#pragma mark - Delay
 
 - (CGFloat)delay
 {
@@ -165,12 +181,32 @@
 
 
 
+- (void)setDelay:(CGFloat)delay
+{
+    _delay = delay;
+    [self refresh];
+}
+
+
+
+#pragma mark - Duration
+
 - (CGFloat)duration
 {
     if (!_duration) return 0.8f;
     return _duration;
 }
 
+
+
+- (void)setDuration:(CGFloat)duration
+{
+    _duration = duration;
+    [self refresh];
+}
+
+
+#pragma mark - Internal Spacing
 
 - (CGFloat)internalSpacing
 {
@@ -180,20 +216,19 @@
 
 - (void)setInternalSpacing:(CGFloat)internalSpacing {
     _internalSpacing = internalSpacing;
-    [self invalidateIntrinsicContentSize];
+    [self refresh];
 }
 
 
+
+#pragma mark - Tint Color
 
 - (void)setTintColor:(UIColor *)tintColor
 {
     [super setTintColor:tintColor];
-
-    if (self.isAnimating)
-    {
-        [self removeCircles];
-        [self addCircles];
-    }
+    [self refresh];
 }
+
+
 
 @end
