@@ -8,7 +8,6 @@
 
 @protocol MONActivityIndicatorViewDelegate;
 
-IB_DESIGNABLE
 @interface MONActivityIndicatorView : UIView <UIAppearanceContainer>
 
 /** The number of circle indicators. */

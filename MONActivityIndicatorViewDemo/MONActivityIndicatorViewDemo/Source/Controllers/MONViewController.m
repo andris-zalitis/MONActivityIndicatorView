@@ -20,7 +20,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     MONActivityIndicatorView *indicatorView = [[MONActivityIndicatorView alloc] init];
     // indicatorView.delegate = self;
     [indicatorView startAnimating];
