@@ -39,8 +39,9 @@
  */
 - (void)stopAnimating;
 
-/// Stops animation allowing all circles to zoom out if gracefully=YES
-- (void)stopAnimating:(BOOL)gracefully;
+/// Stops animation allowing all circles to zoom out gracefully
+/// @param completion optional completion block for callback when all circles have been removed
+- (void)stopAnimatingGracefullyWithCompletion:(void(^)(void))completion;
 
 @end
 

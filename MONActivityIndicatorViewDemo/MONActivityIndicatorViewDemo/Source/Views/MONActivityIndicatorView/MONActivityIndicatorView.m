@@ -16,7 +16,9 @@
 /** An indicator whether the activity indicator view is animating. */
 @property (nonatomic) BOOL isAnimating;
 
+@property (nonatomic, copy) void (^gracefulAnimationCompletionBlock)(void);
 
+@property (nonatomic, assign) BOOL stopRequested;
 
 @end
 
@@ -113,12 +115,17 @@
     BOOL wasDecreasingInSize = [anim.toValue isEqualToNumber:@0];
     
     // if we were asked to stop animating and we have zoomed out, then remove the circle view
-    if (! self.isAnimating && wasDecreasingInSize) {
+    if (self.stopRequested && wasDecreasingInSize) {
         UIView *circle = layer.delegate;
         [circle removeFromSuperview];
         // if we have removed all the circles - hide self
         if ([self.subviews count] == 0) {
+            self.isAnimating = NO;
             self.hidden = YES;
+            if (self.gracefulAnimationCompletionBlock) {
+                self.gracefulAnimationCompletionBlock();
+                self.gracefulAnimationCompletionBlock = nil;
+            }
         }
     } else {
         CABasicAnimation *newAnimation = [self createAnimationWithDuration:self.duration delay:0 reverse:!wasDecreasingInSize];
@@ -139,7 +146,8 @@
         CABasicAnimation *animation = [self createAnimationWithDuration:self.duration delay:(i * self.delay) reverse:NO];
         // save the layer into animation so that we could easily create a new animation for it
         [animation setValue:circle.layer forKey:@"circleLayer"];
-        [circle.layer addAnimation:animation forKey:@"scale"];        [self addSubview:circle];
+        [circle.layer addAnimation:animation forKey:@"scale"];
+        [self addSubview:circle];
     }
 }
 
@@ -154,32 +162,49 @@
 #pragma mark - Public Methods
 
 - (void)startAnimating {
-    if (!self.isAnimating) {
+    if (self.stopRequested) {
         // remove circles in case if previous animation was still gracefully stopping
         [self removeCircles];
+        self.isAnimating = NO;
+    }
+    
+    if (!self.isAnimating) {
         
         // create the new animation
         [self addCircles];
         self.hidden = NO;
         self.isAnimating = YES;
+        self.stopRequested = NO;
     }
 }
 
-- (void)stopAnimating {
+- (void)stopAnimating
+{
     [self stopAnimating:NO];
 }
 
-- (void)stopAnimating:(BOOL)gracefully {
+- (void)stopAnimatingGracefullyWithCompletion:(void(^)(void))completion
+{
+    if (self.isAnimating) {
+        [self stopAnimating:YES];
+        self.gracefulAnimationCompletionBlock = completion;
+    }
+}
+
+
+/// method used only internally
+- (void)stopAnimating:(BOOL)gracefully
+{
     if (self.isAnimating) {
         if (! gracefully) {
             [self removeCircles];
             self.hidden = YES;
+            self.isAnimating = NO;
         }
-        self.isAnimating = NO;
+        self.stopRequested = YES;
     }
+    
 }
-
-
 
 #pragma mark - *** Custom Setters and Getters ***
 

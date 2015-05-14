@@ -49,12 +49,14 @@
 
 - (IBAction)stopGracefully:(id)sender
 {
-    [self.indicatorView stopAnimating:YES];
+    [self.indicatorView stopAnimatingGracefullyWithCompletion:^{
+        NSLog(@"Graceful animation completed! You can remove the view now if you're so inclined.");
+    }];
 }
 
 - (IBAction)stopImmediately:(id)sender
 {
-    [self.indicatorView stopAnimating:NO];
+    [self.indicatorView stopAnimating];
 }
 
 
