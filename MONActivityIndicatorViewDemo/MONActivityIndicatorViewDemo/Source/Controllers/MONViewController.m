@@ -11,6 +11,8 @@
 
 @interface MONViewController () <MONActivityIndicatorViewDelegate>
 
+@property (nonatomic, strong) MONActivityIndicatorView *indicatorView;
+
 @end
 
 @implementation MONViewController
@@ -21,19 +23,38 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    MONActivityIndicatorView *indicatorView = [[MONActivityIndicatorView alloc] init];
+    self.indicatorView = [[MONActivityIndicatorView alloc] init];
     // indicatorView.delegate = self;
-    [indicatorView startAnimating];
-    indicatorView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:indicatorView];
+    self.indicatorView.numberOfCircles = 4;
+    // setting the color by the appearance proxy
+    [[MONActivityIndicatorView appearance] setTintColor:[UIColor colorWithRed:231/255.0 green:113/255.0 blue:177/255.0 alpha:1]];
+    [self.indicatorView startAnimating];
+    self.indicatorView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.indicatorView];
     
-    NSDictionary *views = @{ @"indicatorView" : indicatorView,
+    NSDictionary *views = @{ @"indicatorView" : self.indicatorView,
                              @"superview" : self.view };
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[indicatorView]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[superview]-(<=1)-[indicatorView]" options:NSLayoutFormatAlignAllCenterY metrics:nil views:views]];
 
-    [NSTimer scheduledTimerWithTimeInterval:7 target:indicatorView selector:@selector(stopAnimating) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:9 target:indicatorView selector:@selector(startAnimating) userInfo:nil repeats:NO];
+//    [NSTimer scheduledTimerWithTimeInterval:7 target:indicatorView selector:@selector(stopAnimating) userInfo:nil repeats:NO];
+//    [NSTimer scheduledTimerWithTimeInterval:9 target:indicatorView selector:@selector(startAnimating) userInfo:nil repeats:NO];
+}
+
+
+- (IBAction)start:(id)sender
+{
+    [self.indicatorView startAnimating];
+}
+
+- (IBAction)stopGracefully:(id)sender
+{
+    [self.indicatorView stopAnimating:YES];
+}
+
+- (IBAction)stopImmediately:(id)sender
+{
+    [self.indicatorView stopAnimating:NO];
 }
 
 

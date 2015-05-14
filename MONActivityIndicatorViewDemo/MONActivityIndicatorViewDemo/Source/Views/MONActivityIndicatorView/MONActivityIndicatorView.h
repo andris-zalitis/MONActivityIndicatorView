@@ -35,9 +35,12 @@
 - (void)startAnimating;
 
 /**
- Stops the animation of the acitivity indciator.
+ Immediately stops the animation of the acitivity indciator.
  */
 - (void)stopAnimating;
+
+/// Stops animation allowing all circles to zoom out if gracefully=YES
+- (void)stopAnimating:(BOOL)gracefully;
 
 @end
 
