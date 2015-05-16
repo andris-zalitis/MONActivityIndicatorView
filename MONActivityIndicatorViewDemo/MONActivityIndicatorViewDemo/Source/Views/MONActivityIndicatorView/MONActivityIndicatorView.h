@@ -28,6 +28,9 @@
 /** The assigned delegate */
 @property (nonatomic, weak) id<MONActivityIndicatorViewDelegate> delegate;
 
+/// indicates that graceful stopping has been initiated for this indicator view
+@property (nonatomic, assign) BOOL stopRequested;
+
 
 /**
  Starts the animation of the activity indicator.

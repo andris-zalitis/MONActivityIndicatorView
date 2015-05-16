@@ -18,7 +18,6 @@
 
 @property (nonatomic, copy) void (^gracefulAnimationCompletionBlock)(void);
 
-@property (nonatomic, assign) BOOL stopRequested;
 
 @end
 
@@ -52,12 +51,12 @@
 
 - (void)refresh
 {
-    if (self.isAnimating)
-    {
+    // if stop has been requested we must not recreate circles, gotta allow the animations to stop
+    if (self.isAnimating && !self.stopRequested) {
         [self removeCircles];
         [self addCircles];
+        [self invalidateIntrinsicContentSize];
     }
-    [self invalidateIntrinsicContentSize];
 }
 
 
@@ -85,54 +84,17 @@
  @return The animation of the circle.
  */
 
-- (CABasicAnimation *)createAnimationWithDuration:(CGFloat)duration delay:(CGFloat)delay reverse:(BOOL)reverse {
+- (CABasicAnimation *)createAnimationWithDuration:(CGFloat)duration delay:(CGFloat)delay {
     CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-    anim.delegate = self;
-    if (! reverse) {
-        anim.fromValue = [NSNumber numberWithFloat:0.0f];
-        anim.toValue = [NSNumber numberWithFloat:1.0f];
-    } else {
-        anim.fromValue = [NSNumber numberWithFloat:1.0f];
-        anim.toValue = [NSNumber numberWithFloat:0.0f];
-    }
-    anim.autoreverses = NO;
+    anim.fromValue = [NSNumber numberWithFloat:0.0f];
+    anim.toValue = [NSNumber numberWithFloat:1.0f];
+    anim.autoreverses = YES;
     anim.duration = duration;
-    // can't use this one as YES or it will flicker
     anim.removedOnCompletion = NO;
-    // also need this to not flicker on animation switching
-    anim.fillMode = kCAFillModeForwards;
     anim.beginTime = CACurrentMediaTime()+delay;
-    anim.repeatCount = 0;
+    anim.repeatCount = INFINITY;
     anim.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     return anim;
-}
-
-/// starts the reverse animation to the one that has just stopped
-- (void)animationDidStop:(CABasicAnimation *)anim finished:(BOOL)flag
-{
-    CALayer *layer = [anim valueForKey:@"circleLayer"];
-    
-    BOOL wasDecreasingInSize = [anim.toValue isEqualToNumber:@0];
-    
-    // if we were asked to stop animating and we have zoomed out, then remove the circle view
-    if (self.stopRequested && wasDecreasingInSize) {
-        UIView *circle = layer.delegate;
-        [circle removeFromSuperview];
-        // if we have removed all the circles - hide self
-        if ([self.subviews count] == 0) {
-            self.isAnimating = NO;
-            self.hidden = YES;
-            if (self.gracefulAnimationCompletionBlock) {
-                self.gracefulAnimationCompletionBlock();
-                self.gracefulAnimationCompletionBlock = nil;
-            }
-        }
-    } else {
-        CABasicAnimation *newAnimation = [self createAnimationWithDuration:self.duration delay:0 reverse:!wasDecreasingInSize];
-        [newAnimation setValue:layer forKey:@"circleLayer"];
-        [layer removeAllAnimations];
-        [layer addAnimation:newAnimation forKey:@"scale"];
-    }
 }
 
 - (void)addCircles {
@@ -143,9 +105,7 @@
         }
         UIView *circle = [self createCircleWithRadius:self.radius color:color positionX:(i * ((2 * self.radius) + self.internalSpacing))];
         [circle setTransform:CGAffineTransformMakeScale(0, 0)];
-        CABasicAnimation *animation = [self createAnimationWithDuration:self.duration delay:(i * self.delay) reverse:NO];
-        // save the layer into animation so that we could easily create a new animation for it
-        [animation setValue:circle.layer forKey:@"circleLayer"];
+        CABasicAnimation *animation = [self createAnimationWithDuration:self.duration delay:(i * self.delay)];
         [circle.layer addAnimation:animation forKey:@"scale"];
         [self addSubview:circle];
     }
@@ -196,15 +156,57 @@
 - (void)stopAnimating:(BOOL)gracefully
 {
     if (self.isAnimating) {
+        self.stopRequested = YES;
         if (! gracefully) {
             [self removeCircles];
             self.hidden = YES;
             self.isAnimating = NO;
+        } else {
+            [self addGracefulEndingAnimations];
         }
-        self.stopRequested = YES;
     }
     
 }
+
+- (void)addGracefulEndingAnimations
+{
+    for (UIView *circle in self.subviews) {
+        CALayer *layer = circle.layer;
+        CALayer *presentationLayer = layer.presentationLayer;
+        NSValue *scaleValue = [presentationLayer valueForKeyPath:@"transform.scale"];
+        
+        CABasicAnimation *endingAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+        endingAnimation.fromValue = scaleValue;
+        endingAnimation.toValue = @0;
+        endingAnimation.delegate = self;
+        
+        endingAnimation.duration = self.duration;
+        endingAnimation.removedOnCompletion = NO;
+        endingAnimation.beginTime = CACurrentMediaTime();
+        endingAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+        [endingAnimation setValue:circle forKey:@"circleView"];
+        [circle.layer addAnimation:endingAnimation forKey:@"scale"];
+    }
+}
+
+- (void)animationDidStop:(CABasicAnimation *)anim finished:(BOOL)flag
+{
+    UIView *circle = [anim valueForKey:@"circleView"];
+    
+    [circle removeFromSuperview];
+    
+    // if we have removed all the circles - hide self
+    if ([self.subviews count] == 0) {
+        self.isAnimating = NO;
+        self.hidden = YES;
+        if (self.gracefulAnimationCompletionBlock) {
+            self.gracefulAnimationCompletionBlock();
+            self.gracefulAnimationCompletionBlock = nil;
+        }
+    }
+    
+}
+
 
 #pragma mark - *** Custom Setters and Getters ***
 
